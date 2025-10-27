@@ -12,7 +12,7 @@ const styles = `
 
     body {
         font-family: 'Arial', sans-serif;
-        background: linear-gradient(135deg, #ff6ec4 0%, #7873f5 25%, #42e695 50%, #f9d423 75%, #ff6ec4 100%);
+        background-color: var(--light-bg);
         display: flex;
         justify-content: center;
         align-items: center;
@@ -116,32 +116,28 @@ const styles = `
         background-color: #f0f4f8;
     }
 
-    /* --- AI DASHBOARD RECTANGLE --- */
+    /* --- AI DASHBOARD CIRCLE --- */
     .ai-dashboard-container {
         display: flex;
         justify-content: center;
-        margin-top: 192px; /* 2 inches = 192px */
+        margin-top: 50px;
         margin-bottom: 40px;
     }
 
-    .ai-dashboard-rectangle {
-        width: 260px;
-        height: 70px;
-        background: linear-gradient(90deg, #ff6ec4 0%, #7873f5 100%);
-        border-radius: 24px;
+    .ai-dashboard-circle {
+        width: 150px;
+        height: 150px;
+        background-color: var(--primary-blue);
+        border-radius: 50%;
         color: white;
         display: flex;
         justify-content: center;
         align-items: center;
         font-weight: bold;
         text-align: center;
-        font-size: 20px;
-        box-shadow: 0 5px 20px rgba(0, 123, 255, 0.2);
+        font-size: 16px;
+        box-shadow: 0 5px 20px rgba(0, 123, 255, 0.4);
         cursor: pointer;
-        transition: box-shadow 0.2s;
-    }
-    .ai-dashboard-rectangle:hover {
-        box-shadow: 0 8px 32px rgba(0, 123, 255, 0.3);
     }
 
     /* --- BOTTOM NAVIGATION --- */
@@ -153,7 +149,7 @@ const styles = `
         bottom: 0;
         left: 0;
         right: 0;
-        background: linear-gradient(90deg, #ff6ec4 0%, #7873f5 33%, #42e695 66%, #f9d423 100%);
+        background: var(--app-bg);
         border-top: 1px solid #f0f0f0;
         border-bottom-left-radius: 30px;
         border-bottom-right-radius: 30px;
@@ -322,7 +318,7 @@ const getAppTemplate = (initialGreeting = '') => `
         <div class="location-inputs">
             <div class="input-group">
                 <label>FROM</label>
-                <input type="text" id="from-input" placeholder="Enter heading location">
+                <input type="text" id="from-input" placeholder="Enter Heading location">
             </div>
             
             <div class="input-group">
@@ -335,7 +331,7 @@ const getAppTemplate = (initialGreeting = '') => `
         </div>
 
         <div class="ai-dashboard-container">
-            <div class="ai-dashboard-rectangle">
+            <div class="ai-dashboard-circle">
                 AI Dashboard
             </div>
         </div>
@@ -396,8 +392,7 @@ function initApp() {
     const userNameInput = document.getElementById('user-name-input');
     const saveNameBtn = document.getElementById('save-name-btn');
     const greetingText = document.getElementById('greeting-text');
-   
- const hamburgerBtn = document.getElementById('hamburger-btn');
+    const hamburgerBtn = document.getElementById('hamburger-btn');
     const sideMenuOverlay = document.getElementById('side-menu-overlay');
     const fromInput = document.getElementById('from-input');
     const toInput = document.getElementById('to-input');
