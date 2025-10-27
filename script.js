@@ -56,6 +56,8 @@ const styles = `
         font-size: 22px;
         cursor: pointer;
         color: var(--dark-menu);
+        margin-bottom: 15px;
+        display: inline-block;
     }
 
     /* Greeting */
@@ -129,16 +131,7 @@ const styles = `
     .ai-dashboard-circle {
         width: 350px;
         height: 130px;
-        background: linear-gradient(
-            90deg,
-            #ffb3b3,
-            #ffe0b3,
-            #ffffb3,
-            #b3ffb3,
-            #b3e0ff,
-            #d1b3ff,
-            #ffb3e6
-        );
+        background: linear-gradient(90deg, #ffb3b3, #ffe0b3, #ffffb3, #b3ffb3, #b3e0ff, #d1b3ff, #ffb3e6);
         border-radius: 25px;
         color: #111;
         display: flex;
@@ -150,6 +143,14 @@ const styles = `
         box-shadow: 0 5px 25px rgba(0, 0, 0, 0.2);
         cursor: pointer;
         transition: transform 0.2s ease, box-shadow 0.2s ease;
+        background-size: 400% 400%;
+        animation: rainbowShift 8s ease infinite;
+    }
+
+    @keyframes rainbowShift {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
     }
 
     .ai-dashboard-circle:hover {
@@ -401,6 +402,9 @@ function initApp() {
 
     // --- Menu Navigation ---
     const navigateTo = (pageHTML) => {
+        // Close side menu first
+        sideMenu.classList.add('closed');
+        // Switch to new page
         mainScreen.classList.add('hidden');
         pageContent.classList.remove('hidden');
         pageContent.innerHTML = pageHTML;
