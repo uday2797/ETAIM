@@ -421,8 +421,8 @@ function initApp() {
             <div class="page">
                 <div class="back-btn" id="back-btn">← Back</div>
                 <h2>Profile</h2>
-                <p><strong>Name:</strong> ${userName || 'Jane Doe'}</p>
-                <p><strong>Email:</strong> jane.doe@example.com</p>
+                <p><strong>Name:</strong> ${userName || 'example'}</p>
+                <p><strong>Email:</strong> example@example.com</p>
                 <p><strong>Phone:</strong> +1 555-123-4567</p>
                 <p><strong>Member Since:</strong> Jan 2024</p>
             </div>
