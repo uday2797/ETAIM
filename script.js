@@ -116,7 +116,7 @@ const styles = `
         background-color: #f0f4f8;
     }
 
-    /* --- AI DASHBOARD CIRCLE --- */
+    /* --- AI DASHBOARD RECTANGLE (RAINBOW) --- */
     .ai-dashboard-container {
         display: flex;
         justify-content: center;
@@ -125,19 +125,34 @@ const styles = `
     }
 
     .ai-dashboard-circle {
-        width: 150px;
-        height: 150px;
-        background-color: var(--primary-blue);
-        border-radius: 50%;
+        width: 100%;
+        max-width: 250px;
+        height: 100px;
+        background: linear-gradient(
+            90deg,
+            red,
+            orange,
+            yellow,
+            green,
+            blue,
+            indigo,
+            violet
+        );
+        border-radius: 20px;
         color: white;
         display: flex;
         justify-content: center;
         align-items: center;
         font-weight: bold;
         text-align: center;
-        font-size: 16px;
-        box-shadow: 0 5px 20px rgba(0, 123, 255, 0.4);
+        font-size: 18px;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
         cursor: pointer;
+        transition: transform 0.2s ease;
+    }
+
+    .ai-dashboard-circle:hover {
+        transform: scale(1.05);
     }
 
     /* --- BOTTOM NAVIGATION --- */
@@ -283,7 +298,6 @@ const styles = `
     }
 `;
 
-
 // --- 2. HTML TEMPLATE ---
 const getAppTemplate = (initialGreeting = '') => `
     <div class="app-container">
@@ -318,7 +332,7 @@ const getAppTemplate = (initialGreeting = '') => `
         <div class="location-inputs">
             <div class="input-group">
                 <label>FROM</label>
-                <input type="text" id="from-input" placeholder="Enter Heading location">
+                <input type="text" id="from-input" placeholder="Enter departure location">
             </div>
             
             <div class="input-group">
@@ -326,8 +340,7 @@ const getAppTemplate = (initialGreeting = '') => `
                 <input type="text" id="to-input" placeholder="Enter destination">
             </div>
 
-            <div id="suggestions-box" class="hidden">
-                </div>
+            <div id="suggestions-box" class="hidden"></div>
         </div>
 
         <div class="ai-dashboard-container">
@@ -350,44 +363,29 @@ const getAppTemplate = (initialGreeting = '') => `
                 <span>Food</span>
             </div>
         </nav>
-
     </div>
 `;
 
-
-// --- 3. CORE LOGIC & NOMINATIM INTEGRATION ---
-
-// Global function called after DOM is fully loaded
+// --- 3. CORE LOGIC ---
 function initApp() {
-    
-    // Inject the CSS styles
     const styleSheet = document.createElement('style');
     styleSheet.type = 'text/css';
     styleSheet.innerText = styles;
     document.head.appendChild(styleSheet);
-    
-    // --- Helper Functions ---
+
     const getGreeting = (name) => {
         const hour = new Date().getHours();
         let timeOfDay;
-
-        // Current time is Monday, October 27, 2025 at 11:52:27 PM IST.
-        if (hour < 12) {
-            timeOfDay = 'Morning';
-        } else if (hour < 18) {
-            timeOfDay = 'Afternoon';
-        } else {
-            timeOfDay = 'Evening';
-        }
+        if (hour < 12) timeOfDay = 'Morning';
+        else if (hour < 18) timeOfDay = 'Afternoon';
+        else timeOfDay = 'Evening';
         return `Good ${timeOfDay}, ${name}!`;
     };
 
-    // --- RENDER APP ---
     const root = document.getElementById('app-root');
     const initialGreetingText = userName ? getGreeting(userName) : '';
     root.innerHTML = getAppTemplate(initialGreetingText);
 
-    // --- Element References (After rendering) ---
     const namePromptModal = document.getElementById('name-prompt-modal');
     const userNameInput = document.getElementById('user-name-input');
     const saveNameBtn = document.getElementById('save-name-btn');
@@ -398,35 +396,22 @@ function initApp() {
     const toInput = document.getElementById('to-input');
     const suggestionsBox = document.getElementById('suggestions-box');
     
-    let activeInput = null; // Track which input is currently being typed in
+    let activeInput = null;
 
-    // --- NOMINATIM API LOGIC ---
     let debounceTimeout;
     const NOMINATIM_URL = 'https://nominatim.openstreetmap.org/search';
 
     const fetchLocationSuggestions = async (query) => {
-        // Simple client-side cache check
-        if (locationSuggestionsCache[query]) {
-            return locationSuggestionsCache[query];
-        }
-
-        // Build the URL for the free OpenStreetMap Nominatim API
-        // limit=5: Get top 5 results
-        // addressdetails=0: Minimal data
-        // dedupe=1: Deduplicate results
+        if (locationSuggestionsCache[query]) return locationSuggestionsCache[query];
         const url = `${NOMINATIM_URL}?q=${encodeURIComponent(query)}&format=json&limit=5&addressdetails=0&dedupe=1`;
-        
         try {
             const response = await fetch(url);
             const data = await response.json();
-            
-            // Format and cache data
             const formattedData = data.map(place => ({
                 display_name: place.display_name,
                 lat: place.lat,
                 lon: place.lon
             }));
-            
             locationSuggestionsCache[query] = formattedData;
             return formattedData;
         } catch (error) {
@@ -438,21 +423,18 @@ function initApp() {
     const handleLocationInput = async (e) => {
         const inputElement = e.target;
         const query = inputElement.value.trim();
-        activeInput = inputElement; // Set the currently active input
+        activeInput = inputElement;
 
         clearTimeout(debounceTimeout);
-        
-        // Only start searching if query is 3 characters or more
         if (query.length < 3) {
             suggestionsBox.classList.add('hidden');
             return;
         }
 
-        // Debounce the API call to wait for the user to stop typing
         debounceTimeout = setTimeout(async () => {
             const suggestions = await fetchLocationSuggestions(query);
             renderSuggestions(suggestions);
-        }, 300); 
+        }, 300);
     };
 
     const renderSuggestions = (suggestions) => {
@@ -466,13 +448,11 @@ function initApp() {
             const item = document.createElement('div');
             item.className = 'suggestion-item';
             item.textContent = suggestion.display_name;
-            
-            // Handle selection of a suggestion
             item.addEventListener('click', () => {
                 if (activeInput) {
                     activeInput.value = suggestion.display_name;
                     suggestionsBox.classList.add('hidden');
-                    activeInput.focus(); // Keep focus after selection
+                    activeInput.focus();
                 }
             });
             suggestionsBox.appendChild(item);
@@ -480,27 +460,17 @@ function initApp() {
         suggestionsBox.classList.remove('hidden');
     };
 
-    // --- EVENT LISTENERS ---
-
-    // Attach input handler (for live search) to both location fields
     fromInput.addEventListener('input', handleLocationInput);
     toInput.addEventListener('input', handleLocationInput);
 
-    // Hide suggestions when focus is lost (clicked outside)
     document.addEventListener('click', (e) => {
         if (!suggestionsBox.contains(e.target) && e.target !== fromInput && e.target !== toInput) {
             suggestionsBox.classList.add('hidden');
         }
     });
 
-    // --- UI INTERACTION LOGIC (Greeting, Menu, Prompt) ---
-
-    // Name Prompt Logic
-    if (!userName) {
-        namePromptModal.classList.remove('hidden');
-    } else {
-        namePromptModal.classList.add('hidden');
-    }
+    if (!userName) namePromptModal.classList.remove('hidden');
+    else namePromptModal.classList.add('hidden');
 
     saveNameBtn.addEventListener('click', () => {
         const inputName = userNameInput.value.trim();
@@ -514,12 +484,10 @@ function initApp() {
         }
     });
 
-    // Side Menu Toggle
     hamburgerBtn.addEventListener('click', () => {
         sideMenuOverlay.classList.toggle('closed');
     });
 
-    // Close Menu on overlay click
     sideMenuOverlay.addEventListener('click', (e) => {
         if (e.target.id === 'side-menu-overlay') {
             sideMenuOverlay.classList.add('closed');
@@ -527,5 +495,4 @@ function initApp() {
     });
 }
 
-// Initial application launch when the DOM is ready
 document.addEventListener('DOMContentLoaded', initApp);
