@@ -90,7 +90,7 @@ const styles = `
     #suggestions-box {
         position: absolute;
         width: 100%;
-        top: 155px; /* Position it correctly under the TO input */
+        top: 155px;
         background: white;
         border-radius: 8px;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
@@ -116,43 +116,43 @@ const styles = `
         background-color: #f0f4f8;
     }
 
-    /* --- AI DASHBOARD RECTANGLE (RAINBOW) --- */
+    /* --- AI DASHBOARD RECTANGLE (LIGHT RAINBOW) --- */
     .ai-dashboard-container {
         display: flex;
         justify-content: center;
-        margin-top: 50px;
+        margin-top: 120px; /* ~2 inches */
         margin-bottom: 40px;
     }
 
     .ai-dashboard-circle {
-        width: 100%;
-        max-width: 250px;
-        height: 100px;
+        width: 350px;
+        height: 130px;
         background: linear-gradient(
             90deg,
-            red,
-            orange,
-            yellow,
-            green,
-            blue,
-            indigo,
-            violet
+            #ffb3b3,
+            #ffe0b3,
+            #ffffb3,
+            #b3ffb3,
+            #b3e0ff,
+            #d1b3ff,
+            #ffb3e6
         );
-        border-radius: 20px;
-        color: white;
+        border-radius: 25px;
+        color: #111;
         display: flex;
         justify-content: center;
         align-items: center;
-        font-weight: bold;
+        font-weight: 700;
         text-align: center;
-        font-size: 18px;
-        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+        font-size: 22px;
+        box-shadow: 0 5px 25px rgba(0, 0, 0, 0.2);
         cursor: pointer;
-        transition: transform 0.2s ease;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
     }
 
     .ai-dashboard-circle:hover {
         transform: scale(1.05);
+        box-shadow: 0 5px 30px rgba(0, 0, 0, 0.3);
     }
 
     /* --- BOTTOM NAVIGATION --- */
@@ -344,7 +344,7 @@ const getAppTemplate = (initialGreeting = '') => `
         </div>
 
         <div class="ai-dashboard-container">
-            <div class="ai-dashboard-circle">
+            <div class="ai-dashboard-circle" id="ai-dashboard-btn">
                 AI Dashboard
             </div>
         </div>
@@ -368,6 +368,7 @@ const getAppTemplate = (initialGreeting = '') => `
 
 // --- 3. CORE LOGIC ---
 function initApp() {
+    // Inject styles
     const styleSheet = document.createElement('style');
     styleSheet.type = 'text/css';
     styleSheet.innerText = styles;
@@ -386,6 +387,7 @@ function initApp() {
     const initialGreetingText = userName ? getGreeting(userName) : '';
     root.innerHTML = getAppTemplate(initialGreetingText);
 
+    // Handle name modal
     const namePromptModal = document.getElementById('name-prompt-modal');
     const userNameInput = document.getElementById('user-name-input');
     const saveNameBtn = document.getElementById('save-name-btn');
@@ -395,9 +397,16 @@ function initApp() {
     const fromInput = document.getElementById('from-input');
     const toInput = document.getElementById('to-input');
     const suggestionsBox = document.getElementById('suggestions-box');
+    const aiDashboardBtn = document.getElementById('ai-dashboard-btn');
     
     let activeInput = null;
 
+    // --- AI Dashboard button interaction ---
+    aiDashboardBtn.addEventListener('click', () => {
+        alert('🚀 Opening AI Dashboard...');
+    });
+
+    // --- Nominatim API logic ---
     let debounceTimeout;
     const NOMINATIM_URL = 'https://nominatim.openstreetmap.org/search';
 
