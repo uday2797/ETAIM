@@ -321,7 +321,7 @@ const getAppTemplate = (initialGreeting = '') => `
 
         <div class="location-inputs">
             <div class="input-group">
-                <label>HEADING LOCATION</label>
+                <label>FROM</label>
                 <input type="text" id="from-input" placeholder="Enter heading location">
             </div>
             
