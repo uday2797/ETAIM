@@ -21,8 +21,8 @@ const styles = `
     }
 
     .app-container {
-        width: 375px;
-        height: 800px;
+        width: 400px;
+        height: 900px;
         background-color: var(--app-bg);
         border-radius: 30px;
         box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
@@ -85,8 +85,7 @@ const styles = `
         box-sizing: border-box;
         font-size: 16px;
     }
-    
-    /* Custom Suggestions Box for Nominatim */
+
     #suggestions-box {
         position: absolute;
         width: 100%;
@@ -108,51 +107,47 @@ const styles = `
         transition: background-color 0.1s;
     }
 
-    .suggestion-item:last-child {
-        border-bottom: none;
-    }
-
     .suggestion-item:hover {
         background-color: #f0f4f8;
     }
 
-    /* --- AI DASHBOARD RECTANGLE (LIGHT RAINBOW) --- */
+    /* --- AI DASHBOARD RECTANGLE (RAINBOW) --- */
     .ai-dashboard-container {
         display: flex;
         justify-content: center;
-        margin-top: 120px; /* ~2 inches */
+        margin-top: 80px;
         margin-bottom: 40px;
     }
 
     .ai-dashboard-circle {
-        width: 350px;
-        height: 130px;
+        width: 100%;
+        max-width: 280px;
+        height: 150px;
         background: linear-gradient(
             90deg,
-            #ffb3b3,
-            #ffe0b3,
-            #ffffb3,
-            #b3ffb3,
-            #b3e0ff,
-            #d1b3ff,
-            #ffb3e6
+            red,
+            orange,
+            yellow,
+            green,
+            blue,
+            indigo,
+            violet
         );
         border-radius: 25px;
-        color: #111;
+        color: white;
         display: flex;
         justify-content: center;
         align-items: center;
-        font-weight: 700;
+        font-weight: bold;
         text-align: center;
-        font-size: 22px;
-        box-shadow: 0 5px 25px rgba(0, 0, 0, 0.2);
+        font-size: 20px;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
         cursor: pointer;
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        transition: transform 0.2s ease;
     }
 
     .ai-dashboard-circle:hover {
         transform: scale(1.05);
-        box-shadow: 0 5px 30px rgba(0, 0, 0, 0.3);
     }
 
     /* --- BOTTOM NAVIGATION --- */
@@ -231,66 +226,48 @@ const styles = `
         background-color: #1a4e85;
     }
 
-    .menu-spacer {
-        flex-grow: 1; 
-        min-height: 50px;
-    }
-
-    .menu-settings {
-        border-top: 1px solid rgba(255, 255, 255, 0.1);
-    }
-
-    /* --- NAME PROMPT MODAL --- */
-    .modal-overlay {
+    /* --- PAGE VIEW (Profile/Login/Settings) --- */
+    .page-view {
         position: absolute;
         top: 0;
         left: 0;
-        height: 100%;
         width: 100%;
-        background-color: rgba(0, 0, 0, 0.6);
-        z-index: 1001;
+        height: 100%;
+        background: var(--app-bg);
+        border-radius: 30px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        z-index: 1100;
+        display: none;
+        flex-direction: column;
+        animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .page-header {
         display: flex;
-        justify-content: center;
         align-items: center;
+        padding: 15px 20px;
+        border-bottom: 1px solid #eee;
+        font-weight: bold;
+        color: var(--dark-menu);
+        background: #f9f9f9;
     }
 
-    .modal-content {
-        background: white;
-        padding: 30px;
-        border-radius: 12px;
-        width: 80%;
-        max-width: 300px;
-        text-align: center;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-    }
-
-    .modal-content h3 {
-        margin-top: 0;
+    .back-btn {
+        margin-right: 10px;
+        font-size: 18px;
+        cursor: pointer;
         color: var(--dark-menu);
     }
 
-    #user-name-input {
-        width: 90%;
-        padding: 10px;
-        margin: 15px 0;
-        border: 1px solid #ddd;
-        border-radius: 6px;
-        text-align: center;
-    }
-
-    #save-name-btn {
-        background-color: var(--primary-blue);
-        color: white;
-        border: none;
-        padding: 10px 20px;
-        border-radius: 6px;
-        cursor: pointer;
-        font-size: 16px;
-        transition: background-color 0.2s;
-    }
-
-    #save-name-btn:hover {
-        background-color: #0056b3;
+    .page-content {
+        padding: 20px;
+        overflow-y: auto;
+        flex-grow: 1;
     }
 
     .hidden {
@@ -301,22 +278,11 @@ const styles = `
 // --- 2. HTML TEMPLATE ---
 const getAppTemplate = (initialGreeting = '') => `
     <div class="app-container">
-        
-        <div id="name-prompt-modal" class="modal-overlay">
-            <div class="modal-content">
-                <h3>Welcome!</h3>
-                <p>Please enter your name to personalize your experience.</p>
-                <input type="text" id="user-name-input" placeholder="Your Name">
-                <button id="save-name-btn">Continue</button>
-            </div>
-        </div>
-
         <div id="side-menu-overlay" class="side-menu-overlay closed">
             <div class="side-menu">
-                <div class="menu-item">Profile</div>
-                <div class="menu-item">Login</div>
-                <div class="menu-spacer"></div>
-                <div class="menu-item menu-settings">Settings</div>
+                <div class="menu-item" data-page="profile">Profile</div>
+                <div class="menu-item" data-page="login">Login</div>
+                <div class="menu-item" data-page="settings">Settings</div>
             </div>
         </div>
 
@@ -334,19 +300,15 @@ const getAppTemplate = (initialGreeting = '') => `
                 <label>FROM</label>
                 <input type="text" id="from-input" placeholder="Enter departure location">
             </div>
-            
             <div class="input-group">
                 <label>TO</label>
                 <input type="text" id="to-input" placeholder="Enter destination">
             </div>
-
             <div id="suggestions-box" class="hidden"></div>
         </div>
 
         <div class="ai-dashboard-container">
-            <div class="ai-dashboard-circle" id="ai-dashboard-btn">
-                AI Dashboard
-            </div>
+            <div class="ai-dashboard-circle">🌈 AI Dashboard</div>
         </div>
 
         <nav class="bottom-nav">
@@ -363,17 +325,50 @@ const getAppTemplate = (initialGreeting = '') => `
                 <span>Food</span>
             </div>
         </nav>
+
+        <!-- Hidden Pages -->
+        <div id="profile-page" class="page-view">
+            <div class="page-header"><span class="back-btn"><i class="fas fa-arrow-left"></i></span>Profile</div>
+            <div class="page-content">
+                <p><strong>Name:</strong> ${userName || "Guest User"}</p>
+                <p><strong>Email:</strong> user@example.com</p>
+                <p><strong>Phone:</strong> +91-9876543210</p>
+                <p><strong>Joined:</strong> October 2025</p>
+            </div>
+        </div>
+
+        <div id="login-page" class="page-view">
+            <div class="page-header"><span class="back-btn"><i class="fas fa-arrow-left"></i></span>Login</div>
+            <div class="page-content">
+                <label>Email:</label>
+                <input type="email" placeholder="Enter your email" style="width:100%;padding:10px;margin-bottom:10px;border:1px solid #ddd;border-radius:8px;">
+                <label>Password:</label>
+                <input type="password" placeholder="Enter your password" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:8px;">
+                <button style="width:100%;padding:12px;background:var(--primary-blue);color:white;border:none;border-radius:8px;margin-top:15px;cursor:pointer;">Login</button>
+                <p style="text-align:center;margin-top:15px;color:#555;">Forgot password?</p>
+            </div>
+        </div>
+
+        <div id="settings-page" class="page-view">
+            <div class="page-header"><span class="back-btn"><i class="fas fa-arrow-left"></i></span>Settings</div>
+            <div class="page-content">
+                <p><strong>Notifications:</strong> <input type="checkbox" checked></p>
+                <p><strong>Dark Mode:</strong> <input type="checkbox"></p>
+                <p><strong>Language:</strong> English</p>
+                <p><strong>App Version:</strong> 1.0.0</p>
+            </div>
+        </div>
     </div>
 `;
 
 // --- 3. CORE LOGIC ---
 function initApp() {
-    // Inject styles
     const styleSheet = document.createElement('style');
     styleSheet.type = 'text/css';
     styleSheet.innerText = styles;
     document.head.appendChild(styleSheet);
 
+    const root = document.getElementById('app-root');
     const getGreeting = (name) => {
         const hour = new Date().getHours();
         let timeOfDay;
@@ -382,125 +377,31 @@ function initApp() {
         else timeOfDay = 'Evening';
         return `Good ${timeOfDay}, ${name}!`;
     };
+    root.innerHTML = getAppTemplate(userName ? getGreeting(userName) : '');
 
-    const root = document.getElementById('app-root');
-    const initialGreetingText = userName ? getGreeting(userName) : '';
-    root.innerHTML = getAppTemplate(initialGreetingText);
-
-    // Handle name modal
-    const namePromptModal = document.getElementById('name-prompt-modal');
-    const userNameInput = document.getElementById('user-name-input');
-    const saveNameBtn = document.getElementById('save-name-btn');
-    const greetingText = document.getElementById('greeting-text');
-    const hamburgerBtn = document.getElementById('hamburger-btn');
     const sideMenuOverlay = document.getElementById('side-menu-overlay');
-    const fromInput = document.getElementById('from-input');
-    const toInput = document.getElementById('to-input');
-    const suggestionsBox = document.getElementById('suggestions-box');
-    const aiDashboardBtn = document.getElementById('ai-dashboard-btn');
-    
-    let activeInput = null;
-
-    // --- AI Dashboard button interaction ---
-    aiDashboardBtn.addEventListener('click', () => {
-        alert('🚀 Opening AI Dashboard...');
-    });
-
-    // --- Nominatim API logic ---
-    let debounceTimeout;
-    const NOMINATIM_URL = 'https://nominatim.openstreetmap.org/search';
-
-    const fetchLocationSuggestions = async (query) => {
-        if (locationSuggestionsCache[query]) return locationSuggestionsCache[query];
-        const url = `${NOMINATIM_URL}?q=${encodeURIComponent(query)}&format=json&limit=5&addressdetails=0&dedupe=1`;
-        try {
-            const response = await fetch(url);
-            const data = await response.json();
-            const formattedData = data.map(place => ({
-                display_name: place.display_name,
-                lat: place.lat,
-                lon: place.lon
-            }));
-            locationSuggestionsCache[query] = formattedData;
-            return formattedData;
-        } catch (error) {
-            console.error('Nominatim API error:', error);
-            return [];
-        }
-    };
-
-    const handleLocationInput = async (e) => {
-        const inputElement = e.target;
-        const query = inputElement.value.trim();
-        activeInput = inputElement;
-
-        clearTimeout(debounceTimeout);
-        if (query.length < 3) {
-            suggestionsBox.classList.add('hidden');
-            return;
-        }
-
-        debounceTimeout = setTimeout(async () => {
-            const suggestions = await fetchLocationSuggestions(query);
-            renderSuggestions(suggestions);
-        }, 300);
-    };
-
-    const renderSuggestions = (suggestions) => {
-        suggestionsBox.innerHTML = '';
-        if (suggestions.length === 0) {
-            suggestionsBox.classList.add('hidden');
-            return;
-        }
-
-        suggestions.forEach(suggestion => {
-            const item = document.createElement('div');
-            item.className = 'suggestion-item';
-            item.textContent = suggestion.display_name;
-            item.addEventListener('click', () => {
-                if (activeInput) {
-                    activeInput.value = suggestion.display_name;
-                    suggestionsBox.classList.add('hidden');
-                    activeInput.focus();
-                }
-            });
-            suggestionsBox.appendChild(item);
-        });
-        suggestionsBox.classList.remove('hidden');
-    };
-
-    fromInput.addEventListener('input', handleLocationInput);
-    toInput.addEventListener('input', handleLocationInput);
-
-    document.addEventListener('click', (e) => {
-        if (!suggestionsBox.contains(e.target) && e.target !== fromInput && e.target !== toInput) {
-            suggestionsBox.classList.add('hidden');
-        }
-    });
-
-    if (!userName) namePromptModal.classList.remove('hidden');
-    else namePromptModal.classList.add('hidden');
-
-    saveNameBtn.addEventListener('click', () => {
-        const inputName = userNameInput.value.trim();
-        if (inputName) {
-            userName = inputName;
-            localStorage.setItem('etaimUserName', userName);
-            namePromptModal.classList.add('hidden');
-            greetingText.textContent = getGreeting(userName);
-        } else {
-            alert('Please enter your name to continue.');
-        }
-    });
-
+    const hamburgerBtn = document.getElementById('hamburger-btn');
     hamburgerBtn.addEventListener('click', () => {
         sideMenuOverlay.classList.toggle('closed');
     });
-
     sideMenuOverlay.addEventListener('click', (e) => {
-        if (e.target.id === 'side-menu-overlay') {
+        if (e.target.id === 'side-menu-overlay') sideMenuOverlay.classList.add('closed');
+    });
+
+    // Handle menu page navigation
+    document.querySelectorAll('.menu-item').forEach(item => {
+        item.addEventListener('click', () => {
+            const pageId = item.dataset.page + '-page';
             sideMenuOverlay.classList.add('closed');
-        }
+            document.getElementById(pageId).style.display = 'flex';
+        });
+    });
+
+    // Back buttons
+    document.querySelectorAll('.back-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            btn.closest('.page-view').style.display = 'none';
+        });
     });
 }
 
