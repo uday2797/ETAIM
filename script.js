@@ -94,16 +94,21 @@ const styles = `
         font-size: 16px;
     }
 
-    .search-btn {
+    #search-btn {
         width: 100%;
-        background-color: var(--primary-blue);
-        color: white;
         padding: 12px;
-        border-radius: 8px;
+        background: var(--primary-blue);
+        color: white;
         border: none;
+        border-radius: 8px;
         font-size: 16px;
+        margin-top: 5px;
         cursor: pointer;
-        margin-bottom: 25px;
+        transition: background 0.3s ease;
+    }
+
+    #search-btn:hover {
+        background: #0056b3;
     }
 
     /* Suggestions */
@@ -132,34 +137,42 @@ const styles = `
         background-color: #f0f4f8;
     }
 
-    /* --- AI DASHBOARD CIRCLE --- */
+    /* AI Dashboard */
     .ai-dashboard-container {
         display: flex;
         justify-content: center;
-        margin-top: 90px; /* moved down ~2 inches */
-        margin-bottom: 40px;
+        margin-top: 60px;
+        margin-bottom: 50px;
     }
 
     .ai-dashboard-circle {
-        width: 200px; /* increased size by ~1 inch */
-        height: 200px;
-        background: linear-gradient(135deg, #6a11cb, #2575fc);
+        width: 180px;
+        height: 180px;
+        background: linear-gradient(135deg, #ff7eb3, #ff758c, #ff6f91, #ffc371);
+        background-size: 300% 300%;
         border-radius: 50%;
         color: white;
         display: flex;
         justify-content: center;
         align-items: center;
         font-weight: bold;
-        text-align: center;
-        font-size: 18px;
-        box-shadow: 0 5px 20px rgba(0, 123, 255, 0.4);
+        font-size: 20px;
+        box-shadow: 0 5px 25px rgba(255, 111, 145, 0.4);
         cursor: pointer;
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        animation: rainbowPulse 6s ease infinite;
+        transition: transform 0.3s ease;
+        text-align: center;
     }
 
     .ai-dashboard-circle:hover {
         transform: scale(1.05);
-        box-shadow: 0 10px 25px rgba(0, 123, 255, 0.6);
+        box-shadow: 0 8px 30px rgba(255, 105, 180, 0.5);
+    }
+
+    @keyframes rainbowPulse {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
     }
 
     /* Bottom Nav */
@@ -196,14 +209,16 @@ const styles = `
         color: var(--primary-blue);
     }
 
-    /* Modal + Menu (unchanged) */
-    .side-menu-overlay { ... }
-    .side-menu { ... }
+    /* Pages */
+    .page {
+        padding: 20px;
+        color: #333;
+    }
 
-    .hidden { display: none !important; }
-
-    .page { padding: 20px; color: #333; }
-    .page h2 { margin-top: 0; color: var(--dark-menu); }
+    .page h2 {
+        margin-top: 0;
+        color: var(--dark-menu);
+    }
 
     .toggle {
         display: flex;
@@ -211,9 +226,12 @@ const styles = `
         align-items: center;
         margin: 10px 0;
     }
+
+    .hidden {
+        display: none !important;
+    }
 `;
 
-// --- HTML Template (added search button) ---
 const getAppTemplate = (greeting = '') => `
     <div class="app-container">
         <header class="header">
@@ -232,8 +250,7 @@ const getAppTemplate = (greeting = '') => `
                     <label>TO</label>
                     <input type="text" id="to-input" placeholder="Enter destination">
                 </div>
-                <button id="search-btn" class="search-btn">Search</button>
-                <div id="suggestions-box" class="hidden"></div>
+                <button id="search-btn">Search</button>
             </div>
 
             <div class="ai-dashboard-container">
@@ -244,18 +261,6 @@ const getAppTemplate = (greeting = '') => `
         </div>
 
         <div id="page-content" class="hidden"></div>
-
-        <nav class="bottom-nav">
-            <div class="nav-item active">
-                <i class="fas fa-car"></i><span>Commute</span>
-            </div>
-            <div class="nav-item">
-                <i class="fas fa-chart-line"></i><span>Dashboards</span>
-            </div>
-            <div class="nav-item">
-                <i class="fas fa-utensils"></i><span>Food</span>
-            </div>
-        </nav>
     </div>
 `;
 
@@ -270,79 +275,45 @@ function initApp() {
     root.innerHTML = getAppTemplate(greeting);
 
     const aiBtn = document.getElementById('ai-dashboard-btn');
-    const mainScreen = document.getElementById('main-screen');
+    const searchBtn = document.getElementById('search-btn');
     const pageContent = document.getElementById('page-content');
+    const mainScreen = document.getElementById('main-screen');
 
-    const navigateTo = (html) => {
-        mainScreen.classList.add('hidden');
-        pageContent.classList.remove('hidden');
-        pageContent.innerHTML = html;
-    };
-
+    // Back to Home helper
     const backToHome = () => {
         pageContent.classList.add('hidden');
         mainScreen.classList.remove('hidden');
     };
 
-    // --- Registration Form Page ---
-    aiBtn.onclick = () => {
-        const toLocation = document.getElementById('to-input').value || '';
-        navigateTo(`
+    // --- Registration Page ---
+    function showRegistrationForm() {
+        mainScreen.classList.add('hidden');
+        pageContent.classList.remove('hidden');
+        pageContent.innerHTML = `
             <div class="page">
                 <div class="back-btn" id="back-btn">← Back</div>
-                <h2>Registration Form</h2>
-
-                <label>Destination Location</label>
-                <input type="text" id="dest" value="${toLocation}" style="width:100%;padding:10px;margin:10px 0;border:1px solid #ccc;border-radius:6px;">
-
-                <div class="toggle">
-                    <span>Is destination an office location?</span>
-                    <input type="checkbox" id="isOffice">
-                </div>
-
-                <div id="loginTimeContainer" class="hidden">
-                    <label>Login Time</label>
-                    <input type="time" id="loginTime" style="width:100%;padding:10px;margin:10px 0;border:1px solid #ccc;border-radius:6px;">
-                </div>
-
-                <label>Usual Commute Mode</label>
-                <select id="commuteMode" style="width:100%;padding:10px;margin:10px 0;border:1px solid #ccc;border-radius:6px;">
-                    <option value="">Select</option>
-                    <option>Own Vehicle</option>
-                    <option>Ola</option>
-                    <option>Uber</option>
-                    <option>Rapido</option>
+                <h2>Registration</h2>
+                <input type="text" placeholder="Full Name" style="width:100%;padding:10px;margin:10px 0;border:1px solid #ccc;border-radius:6px;">
+                <input type="email" placeholder="Email" style="width:100%;padding:10px;margin:10px 0;border:1px solid #ccc;border-radius:6px;">
+                <select style="width:100%;padding:10px;margin:10px 0;border:1px solid #ccc;border-radius:6px;">
+                    <option value="">Select Role</option>
+                    <option>Rider</option>
+                    <option>Driver</option>
                 </select>
-
-                <label>Food Preference</label>
-                <select id="foodPref" style="width:100%;padding:10px;margin:10px 0;border:1px solid #ccc;border-radius:6px;">
-                    <option value="">Select</option>
-                    <option>South Indian</option>
-                    <option>North Indian</option>
-                </select>
-
-                <button id="submitReg" class="search-btn">Submit</button>
+                <div class="toggle"><span>Receive Updates</span><input type="checkbox" checked></div>
+                <button id="submit-reg" style="width:100%;padding:10px;background:var(--primary-blue);color:white;border:none;border-radius:6px;">Submit</button>
             </div>
-        `);
-
+        `;
         document.getElementById('back-btn').onclick = backToHome;
-
-        const isOffice = document.getElementById('isOffice');
-        const loginTimeContainer = document.getElementById('loginTimeContainer');
-        isOffice.addEventListener('change', () => {
-            loginTimeContainer.classList.toggle('hidden', !isOffice.checked);
-        });
-
-        document.getElementById('submitReg').onclick = () => {
-            alert('✅ Registration Submitted Successfully!');
+        document.getElementById('submit-reg').onclick = () => {
+            alert("🎉 Registration submitted successfully!");
             backToHome();
         };
-    };
+    }
 
-    // Search button
-    document.getElementById('search-btn').onclick = () => {
-        alert('🔍 Searching for best commute options...');
-    };
+    // --- Clicks ---
+    aiBtn.onclick = () => alert('🚀 Opening AI Dashboard...');
+    searchBtn.onclick = showRegistrationForm;
 }
 
 const getGreeting = (name) => {
