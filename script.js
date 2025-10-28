@@ -94,23 +94,6 @@ const styles = `
         font-size: 16px;
     }
 
-    #search-btn {
-        width: 100%;
-        padding: 12px;
-        background: var(--primary-blue);
-        color: white;
-        border: none;
-        border-radius: 8px;
-        font-size: 16px;
-        margin-top: 5px;
-        cursor: pointer;
-        transition: background 0.3s ease;
-    }
-
-    #search-btn:hover {
-        background: #0056b3;
-    }
-
     /* Suggestions */
     #suggestions-box {
         position: absolute;
@@ -137,42 +120,29 @@ const styles = `
         background-color: #f0f4f8;
     }
 
-    /* AI Dashboard */
+    /* --- AI DASHBOARD CIRCLE --- */
     .ai-dashboard-container {
         display: flex;
         justify-content: center;
-        margin-top: 60px;
-        margin-bottom: 50px;
+        margin-top: 120px;
+        margin-top: 50px;
+        margin-bottom: 40px;
     }
 
     .ai-dashboard-circle {
-        width: 180px;
-        height: 180px;
-        background: linear-gradient(135deg, #ff7eb3, #ff758c, #ff6f91, #ffc371);
-        background-size: 300% 300%;
+        width: 150px;
+        height: 150px;
+        background-color: var(--primary-blue);
         border-radius: 50%;
         color: white;
         display: flex;
         justify-content: center;
         align-items: center;
         font-weight: bold;
-        font-size: 20px;
-        box-shadow: 0 5px 25px rgba(255, 111, 145, 0.4);
-        cursor: pointer;
-        animation: rainbowPulse 6s ease infinite;
-        transition: transform 0.3s ease;
         text-align: center;
-    }
-
-    .ai-dashboard-circle:hover {
-        transform: scale(1.05);
-        box-shadow: 0 8px 30px rgba(255, 105, 180, 0.5);
-    }
-
-    @keyframes rainbowPulse {
-        0% { background-position: 0% 50%; }
-        50% { background-position: 100% 50%; }
-        100% { background-position: 0% 50%; }
+        font-size: 16px;
+        box-shadow: 0 5px 20px rgba(0, 123, 255, 0.4);
+        cursor: pointer;
     }
 
     /* Bottom Nav */
@@ -209,6 +179,97 @@ const styles = `
         color: var(--primary-blue);
     }
 
+    /* Side Menu */
+    .side-menu-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 100%;
+        width: 100%;
+        background-color: rgba(0, 0, 0, 0.4);
+        z-index: 1000;
+        transition: opacity 0.3s ease, visibility 0.3s ease;
+    }
+
+    .side-menu-overlay.closed {
+        opacity: 0;
+        visibility: hidden;
+    }
+
+    .side-menu {
+        position: absolute;
+        top: 55px;
+        right: 20px;
+        width: 180px;
+        background-color: var(--dark-menu);
+        border-radius: 8px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+        padding: 10px 0;
+        color: white;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .menu-item {
+        padding: 12px 20px;
+        cursor: pointer;
+        transition: background-color 0.2s;
+    }
+
+    .menu-item:hover {
+        background-color: #1a4e85;
+    }
+
+    .menu-settings {
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    /* Modal */
+    .modal-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 100%;
+        width: 100%;
+        background-color: rgba(0, 0, 0, 0.6);
+        z-index: 1001;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .modal-content {
+        background: white;
+        padding: 30px;
+        border-radius: 12px;
+        width: 80%;
+        max-width: 300px;
+        text-align: center;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    }
+
+    #user-name-input {
+        width: 90%;
+        padding: 10px;
+        margin: 15px 0;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        text-align: center;
+    }
+
+    #save-name-btn {
+        background-color: var(--primary-blue);
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 6px;
+        cursor: pointer;
+    }
+
+    .hidden {
+        display: none !important;
+    }
+
     /* Pages */
     .page {
         padding: 20px;
@@ -226,14 +287,28 @@ const styles = `
         align-items: center;
         margin: 10px 0;
     }
-
-    .hidden {
-        display: none !important;
-    }
 `;
 
+// --- HTML Template ---
 const getAppTemplate = (greeting = '') => `
     <div class="app-container">
+        <div id="name-prompt-modal" class="modal-overlay">
+            <div class="modal-content">
+                <h3>Welcome!</h3>
+                <p>Please enter your name to personalize your experience.</p>
+                <input type="text" id="user-name-input" placeholder="Your Name">
+                <button id="save-name-btn">Continue</button>
+            </div>
+        </div>
+
+        <div id="side-menu-overlay" class="side-menu-overlay closed">
+            <div class="side-menu">
+                <div class="menu-item" id="profile-btn">Profile</div>
+                <div class="menu-item" id="login-btn">Login</div>
+                <div class="menu-item menu-settings" id="settings-btn">Settings</div>
+            </div>
+        </div>
+
         <header class="header">
             <div class="logo">ETAIM</div>
             <div id="hamburger-btn" class="hamburger-menu"><i class="fas fa-bars"></i></div>
@@ -250,7 +325,7 @@ const getAppTemplate = (greeting = '') => `
                     <label>TO</label>
                     <input type="text" id="to-input" placeholder="Enter destination">
                 </div>
-                <button id="search-btn">Search</button>
+                <div id="suggestions-box" class="hidden"></div>
             </div>
 
             <div class="ai-dashboard-container">
@@ -261,6 +336,18 @@ const getAppTemplate = (greeting = '') => `
         </div>
 
         <div id="page-content" class="hidden"></div>
+
+        <nav class="bottom-nav">
+            <div class="nav-item active">
+                <i class="fas fa-car"></i><span>Commute</span>
+            </div>
+            <div class="nav-item">
+                <i class="fas fa-chart-line"></i><span>Dashboards</span>
+            </div>
+            <div class="nav-item">
+                <i class="fas fa-utensils"></i><span>Food</span>
+            </div>
+        </nav>
     </div>
 `;
 
@@ -274,46 +361,90 @@ function initApp() {
     const greeting = userName ? getGreeting(userName) : '';
     root.innerHTML = getAppTemplate(greeting);
 
+    const nameModal = document.getElementById('name-prompt-modal');
+    const nameInput = document.getElementById('user-name-input');
+    const saveBtn = document.getElementById('save-name-btn');
+    const greetingText = document.getElementById('greeting-text');
+    const hamburger = document.getElementById('hamburger-btn');
+    const sideMenu = document.getElementById('side-menu-overlay');
     const aiBtn = document.getElementById('ai-dashboard-btn');
-    const searchBtn = document.getElementById('search-btn');
     const pageContent = document.getElementById('page-content');
     const mainScreen = document.getElementById('main-screen');
 
-    // Back to Home helper
+    if (!userName) nameModal.classList.remove('hidden');
+
+    saveBtn.onclick = () => {
+        const val = nameInput.value.trim();
+        if (val) {
+            localStorage.setItem('etaimUserName', val);
+            userName = val;
+            nameModal.classList.add('hidden');
+            greetingText.textContent = getGreeting(val);
+        } else alert('Please enter your name.');
+    };
+
+    hamburger.onclick = () => sideMenu.classList.toggle('closed');
+    sideMenu.onclick = (e) => { if (e.target.id === 'side-menu-overlay') sideMenu.classList.add('closed'); };
+    aiBtn.onclick = () => alert('🚀 Opening AI Dashboard...');
+
+    // --- Menu Navigation ---
+    const navigateTo = (pageHTML) => {
+        // Close side menu first
+        sideMenu.classList.add('closed');
+        // Switch to new page
+        mainScreen.classList.add('hidden');
+        pageContent.classList.remove('hidden');
+        pageContent.innerHTML = pageHTML;
+    };
+
     const backToHome = () => {
         pageContent.classList.add('hidden');
         mainScreen.classList.remove('hidden');
     };
 
-    // --- Registration Page ---
-    function showRegistrationForm() {
-        mainScreen.classList.add('hidden');
-        pageContent.classList.remove('hidden');
-        pageContent.innerHTML = `
+    // Profile
+    document.getElementById('profile-btn').onclick = () => {
+        navigateTo(`
             <div class="page">
                 <div class="back-btn" id="back-btn">← Back</div>
-                <h2>Registration</h2>
-                <input type="text" placeholder="Full Name" style="width:100%;padding:10px;margin:10px 0;border:1px solid #ccc;border-radius:6px;">
-                <input type="email" placeholder="Email" style="width:100%;padding:10px;margin:10px 0;border:1px solid #ccc;border-radius:6px;">
-                <select style="width:100%;padding:10px;margin:10px 0;border:1px solid #ccc;border-radius:6px;">
-                    <option value="">Select Role</option>
-                    <option>Rider</option>
-                    <option>Driver</option>
-                </select>
-                <div class="toggle"><span>Receive Updates</span><input type="checkbox" checked></div>
-                <button id="submit-reg" style="width:100%;padding:10px;background:var(--primary-blue);color:white;border:none;border-radius:6px;">Submit</button>
+                <h2>Profile</h2>
+                <p><strong>Name:</strong> ${userName || 'example'}</p>
+                <p><strong>Email:</strong> example@example.com</p>
+                <p><strong>Phone:</strong> +1 555-123-4567</p>
+                <p><strong>Member Since:</strong> Jan 2024</p>
             </div>
-        `;
+        `);
         document.getElementById('back-btn').onclick = backToHome;
-        document.getElementById('submit-reg').onclick = () => {
-            alert("🎉 Registration submitted successfully!");
-            backToHome();
-        };
-    }
+    };
 
-    // --- Clicks ---
-    aiBtn.onclick = () => alert('🚀 Opening AI Dashboard...');
-    searchBtn.onclick = showRegistrationForm;
+    // Login
+    document.getElementById('login-btn').onclick = () => {
+        navigateTo(`
+            <div class="page">
+                <div class="back-btn" id="back-btn">← Back</div>
+                <h2>Login</h2>
+                <input type="email" placeholder="Email" style="width:100%;padding:10px;margin:10px 0;border-radius:6px;border:1px solid #ccc;">
+                <input type="password" placeholder="Password" style="width:100%;padding:10px;margin:10px 0;border-radius:6px;border:1px solid #ccc;">
+                <button style="width:100%;padding:10px;background:var(--primary-blue);color:#fff;border:none;border-radius:6px;">Login</button>
+                <p style="text-align:center;margin-top:10px;"><a href="#" style="color:var(--primary-blue);text-decoration:none;">Forgot password?</a></p>
+            </div>
+        `);
+        document.getElementById('back-btn').onclick = backToHome;
+    };
+
+    // Settings
+    document.getElementById('settings-btn').onclick = () => {
+        navigateTo(`
+            <div class="page">
+                <div class="back-btn" id="back-btn">← Back</div>
+                <h2>Settings</h2>
+                <div class="toggle"><span>Notifications</span><input type="checkbox" checked></div>
+                <div class="toggle"><span>Dark Mode</span><input type="checkbox"></div>
+                <p style="margin-top:20px;">App Version: <strong>v1.0.0</strong></p>
+            </div>
+        `);
+        document.getElementById('back-btn').onclick = backToHome;
+    };
 }
 
 const getGreeting = (name) => {
