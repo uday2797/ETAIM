@@ -350,7 +350,7 @@ const getAppTemplate = (greeting = '') => `
             <div class="location-inputs">
                 <div class="input-group">
                     <label>FROM</label>
-                    <input type="text" id="from-input" placeholder="Enter departure location">
+                    <input type="text" id="from-input" placeholder="Enter heading location">
                 </div>
                 <div class="input-group">
                     <label>TO</label>
@@ -363,7 +363,7 @@ const getAppTemplate = (greeting = '') => `
 
             <div class="ai-dashboard-container">
                 <div class="ai-dashboard-circle" id="ai-dashboard-btn">
-                    AI Dashboard
+                    Create AI Dashboard
                 </div>
             </div>
         </div>
