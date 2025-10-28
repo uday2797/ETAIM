@@ -94,6 +94,25 @@ const styles = `
         font-size: 16px;
     }
 
+    /* Search Button */
+    #search-btn {
+        width: 100%;
+        padding: 12px;
+        border: none;
+        border-radius: 10px;
+        background: var(--primary-blue);
+        color: white;
+        font-weight: bold;
+        font-size: 16px;
+        cursor: pointer;
+        transition: 0.2s;
+        margin-bottom: 25px;
+    }
+
+    #search-btn:hover {
+        background: #0056b3;
+    }
+
     /* Suggestions */
     #suggestions-box {
         position: absolute;
@@ -120,19 +139,20 @@ const styles = `
         background-color: #f0f4f8;
     }
 
-    /* --- AI DASHBOARD CIRCLE --- */
+    /* --- AI DASHBOARD CIRCLE (enlarged & centered) --- */
     .ai-dashboard-container {
         display: flex;
         justify-content: center;
-        margin-top: 120px;
         margin-top: 50px;
         margin-bottom: 40px;
     }
 
     .ai-dashboard-circle {
-        width: 150px;
-        height: 150px;
-        background-color: var(--primary-blue);
+        width: 190px;
+        height: 190px;
+        background: linear-gradient(135deg, #007bff, #00c6ff, #ff6f00, #ff00a6);
+        background-size: 400% 400%;
+        animation: rainbowShift 6s infinite linear;
         border-radius: 50%;
         color: white;
         display: flex;
@@ -140,9 +160,20 @@ const styles = `
         align-items: center;
         font-weight: bold;
         text-align: center;
-        font-size: 16px;
-        box-shadow: 0 5px 20px rgba(0, 123, 255, 0.4);
+        font-size: 18px;
+        box-shadow: 0 8px 30px rgba(0, 123, 255, 0.4);
         cursor: pointer;
+        transition: transform 0.3s ease;
+    }
+
+    .ai-dashboard-circle:hover {
+        transform: scale(1.08);
+    }
+
+    @keyframes rainbowShift {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
     }
 
     /* Bottom Nav */
@@ -179,97 +210,6 @@ const styles = `
         color: var(--primary-blue);
     }
 
-    /* Side Menu */
-    .side-menu-overlay {
-        position: absolute;
-        top: 0;
-        left: 0;
-        height: 100%;
-        width: 100%;
-        background-color: rgba(0, 0, 0, 0.4);
-        z-index: 1000;
-        transition: opacity 0.3s ease, visibility 0.3s ease;
-    }
-
-    .side-menu-overlay.closed {
-        opacity: 0;
-        visibility: hidden;
-    }
-
-    .side-menu {
-        position: absolute;
-        top: 55px;
-        right: 20px;
-        width: 180px;
-        background-color: var(--dark-menu);
-        border-radius: 8px;
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
-        padding: 10px 0;
-        color: white;
-        display: flex;
-        flex-direction: column;
-    }
-
-    .menu-item {
-        padding: 12px 20px;
-        cursor: pointer;
-        transition: background-color 0.2s;
-    }
-
-    .menu-item:hover {
-        background-color: #1a4e85;
-    }
-
-    .menu-settings {
-        border-top: 1px solid rgba(255, 255, 255, 0.1);
-    }
-
-    /* Modal */
-    .modal-overlay {
-        position: absolute;
-        top: 0;
-        left: 0;
-        height: 100%;
-        width: 100%;
-        background-color: rgba(0, 0, 0, 0.6);
-        z-index: 1001;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    }
-
-    .modal-content {
-        background: white;
-        padding: 30px;
-        border-radius: 12px;
-        width: 80%;
-        max-width: 300px;
-        text-align: center;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-    }
-
-    #user-name-input {
-        width: 90%;
-        padding: 10px;
-        margin: 15px 0;
-        border: 1px solid #ddd;
-        border-radius: 6px;
-        text-align: center;
-    }
-
-    #save-name-btn {
-        background-color: var(--primary-blue);
-        color: white;
-        border: none;
-        padding: 10px 20px;
-        border-radius: 6px;
-        cursor: pointer;
-    }
-
-    .hidden {
-        display: none !important;
-    }
-
     /* Pages */
     .page {
         padding: 20px;
@@ -279,6 +219,31 @@ const styles = `
     .page h2 {
         margin-top: 0;
         color: var(--dark-menu);
+    }
+
+    /* Registration form */
+    .form-input {
+        width: 100%;
+        padding: 12px;
+        margin: 10px 0;
+        border-radius: 8px;
+        border: 1px solid #ccc;
+        font-size: 15px;
+    }
+
+    .form-btn {
+        width: 100%;
+        background: var(--primary-blue);
+        color: white;
+        padding: 12px;
+        border: none;
+        border-radius: 8px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+    .form-btn:hover {
+        background: #0056b3;
     }
 
     .toggle {
@@ -292,30 +257,23 @@ const styles = `
 // --- HTML Template ---
 const getAppTemplate = (greeting = '') => `
     <div class="app-container">
-        <div id="name-prompt-modal" class="modal-overlay">
-            <div class="modal-content">
-                <h3>Welcome!</h3>
-                <p>Please enter your name to personalize your experience.</p>
-                <input type="text" id="user-name-input" placeholder="Your Name">
-                <button id="save-name-btn">Continue</button>
-            </div>
-        </div>
-
-        <div id="side-menu-overlay" class="side-menu-overlay closed">
-            <div class="side-menu">
-                <div class="menu-item" id="profile-btn">Profile</div>
-                <div class="menu-item" id="login-btn">Login</div>
-                <div class="menu-item menu-settings" id="settings-btn">Settings</div>
-            </div>
-        </div>
-
         <header class="header">
             <div class="logo">ETAIM</div>
             <div id="hamburger-btn" class="hamburger-menu"><i class="fas fa-bars"></i></div>
         </header>
 
+        <div id="side-menu-overlay" class="side-menu-overlay closed">
+            <div class="side-menu">
+                <div class="menu-item" id="profile-btn">Profile</div>
+                <div class="menu-item" id="login-btn">Login</div>
+                <div class="menu-item" id="register-btn">Register</div>
+                <div class="menu-item menu-settings" id="settings-btn">Settings</div>
+            </div>
+        </div>
+
         <div id="main-screen">
             <div id="greeting-text" class="greeting">${greeting}</div>
+
             <div class="location-inputs">
                 <div class="input-group">
                     <label>FROM</label>
@@ -325,6 +283,7 @@ const getAppTemplate = (greeting = '') => `
                     <label>TO</label>
                     <input type="text" id="to-input" placeholder="Enter destination">
                 </div>
+                <button id="search-btn">Search</button>
                 <div id="suggestions-box" class="hidden"></div>
             </div>
 
@@ -358,40 +317,19 @@ function initApp() {
     document.head.appendChild(style);
 
     const root = document.getElementById('app-root');
-    const greeting = userName ? getGreeting(userName) : '';
+    const greeting = userName ? getGreeting(userName) : 'Welcome!';
     root.innerHTML = getAppTemplate(greeting);
 
-    const nameModal = document.getElementById('name-prompt-modal');
-    const nameInput = document.getElementById('user-name-input');
-    const saveBtn = document.getElementById('save-name-btn');
-    const greetingText = document.getElementById('greeting-text');
     const hamburger = document.getElementById('hamburger-btn');
     const sideMenu = document.getElementById('side-menu-overlay');
     const aiBtn = document.getElementById('ai-dashboard-btn');
     const pageContent = document.getElementById('page-content');
     const mainScreen = document.getElementById('main-screen');
 
-    if (!userName) nameModal.classList.remove('hidden');
-
-    saveBtn.onclick = () => {
-        const val = nameInput.value.trim();
-        if (val) {
-            localStorage.setItem('etaimUserName', val);
-            userName = val;
-            nameModal.classList.add('hidden');
-            greetingText.textContent = getGreeting(val);
-        } else alert('Please enter your name.');
-    };
-
     hamburger.onclick = () => sideMenu.classList.toggle('closed');
-    sideMenu.onclick = (e) => { if (e.target.id === 'side-menu-overlay') sideMenu.classList.add('closed'); };
-    aiBtn.onclick = () => alert('🚀 Opening AI Dashboard...');
 
-    // --- Menu Navigation ---
     const navigateTo = (pageHTML) => {
-        // Close side menu first
         sideMenu.classList.add('closed');
-        // Switch to new page
         mainScreen.classList.add('hidden');
         pageContent.classList.remove('hidden');
         pageContent.innerHTML = pageHTML;
@@ -400,6 +338,16 @@ function initApp() {
     const backToHome = () => {
         pageContent.classList.add('hidden');
         mainScreen.classList.remove('hidden');
+    };
+
+    // Search button
+    document.getElementById('search-btn').onclick = () => {
+        alert('Searching rides...');
+    };
+
+    // AI Dashboard
+    aiBtn.onclick = () => {
+        alert('🚀 Opening AI Dashboard...');
     };
 
     // Profile
@@ -423,10 +371,28 @@ function initApp() {
             <div class="page">
                 <div class="back-btn" id="back-btn">← Back</div>
                 <h2>Login</h2>
-                <input type="email" placeholder="Email" style="width:100%;padding:10px;margin:10px 0;border-radius:6px;border:1px solid #ccc;">
-                <input type="password" placeholder="Password" style="width:100%;padding:10px;margin:10px 0;border-radius:6px;border:1px solid #ccc;">
-                <button style="width:100%;padding:10px;background:var(--primary-blue);color:#fff;border:none;border-radius:6px;">Login</button>
-                <p style="text-align:center;margin-top:10px;"><a href="#" style="color:var(--primary-blue);text-decoration:none;">Forgot password?</a></p>
+                <input type="email" class="form-input" placeholder="Email">
+                <input type="password" class="form-input" placeholder="Password">
+                <button class="form-btn">Login</button>
+                <p style="text-align:center;margin-top:10px;">
+                    <a href="#" style="color:var(--primary-blue);text-decoration:none;">Forgot password?</a>
+                </p>
+            </div>
+        `);
+        document.getElementById('back-btn').onclick = backToHome;
+    };
+
+    // Registration
+    document.getElementById('register-btn').onclick = () => {
+        navigateTo(`
+            <div class="page">
+                <div class="back-btn" id="back-btn">← Back</div>
+                <h2>Register</h2>
+                <input type="text" class="form-input" placeholder="Full Name">
+                <input type="email" class="form-input" placeholder="Email">
+                <input type="password" class="form-input" placeholder="Password">
+                <input type="tel" class="form-input" placeholder="Phone Number">
+                <button class="form-btn">Create Account</button>
             </div>
         `);
         document.getElementById('back-btn').onclick = backToHome;
