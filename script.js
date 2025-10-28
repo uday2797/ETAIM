@@ -93,7 +93,7 @@ const styles = `
         box-sizing: border-box;
         font-size: 16px;
     }
-    .map-section {
+    #map-section {
         margin-top: 15px;
         background: #fff;
         padding: 10px;
@@ -101,14 +101,14 @@ const styles = `
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     }
     
-    .map-section h3 {
+    #map-section h3 {
         text-align: center;
         margin-bottom: 8px;
         font-size: 1rem;
         color: #333;
     }
     
-    .map {
+    #map {
         width: 100%;
         height: 220px;
         border-radius: 10px;
