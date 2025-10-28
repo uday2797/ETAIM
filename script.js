@@ -93,6 +93,27 @@ const styles = `
         box-sizing: border-box;
         font-size: 16px;
     }
+    .map-section {
+        margin-top: 15px;
+        background: #fff;
+        padding: 10px;
+        border-radius: 15px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+    
+    .map-section h3 {
+        text-align: center;
+        margin-bottom: 8px;
+        font-size: 1rem;
+        color: #333;
+    }
+    
+    .map {
+        width: 100%;
+        height: 220px;
+        border-radius: 10px;
+    }
+
 
     /* Search Button */
     #search-btn {
@@ -366,6 +387,10 @@ const getAppTemplate = (greeting = '') => `
                     Create AI Dashboard
                 </div>
             </div>
+            <div id="map-section">
+                <h3>Nearby Activity Map</h3>
+                <div id="map"></div>
+            </div>
         </div>
 
         <div id="page-content" class="hidden"></div>
@@ -468,6 +493,18 @@ function initApp() {
             suggestionsBox.classList.add('hidden');
         }
     });
+
+    // --- Initialize map ---
+    setTimeout(() => {
+        if (document.getElementById('map')) {
+            const map = L.map('map').setView([16.5062, 80.6480], 13); // Vijayawada coords
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; OpenStreetMap contributors'
+            }).addTo(map);
+            L.marker([16.5062, 80.6480]).addTo(map).bindPopup('Your Location');
+        }
+    }, 500);
+
 
     document.getElementById('search-btn').onclick = () => {
         alert(`Searching rides from "${fromInput.value}" to "${toInput.value}"`);
