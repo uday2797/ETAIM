@@ -93,7 +93,7 @@ const styles = `
         box-sizing: border-box;
         font-size: 16px;
     }
-    .map-section {
+    #map-section {
         margin-top: 15px;
         background: #fff;
         padding: 10px;
@@ -101,19 +101,51 @@ const styles = `
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     }
     
-    .map-section h3 {
+    #map-section h3 {
         text-align: center;
         margin-bottom: 8px;
         font-size: 1rem;
         color: #333;
     }
     
-    .map {
+    #map {
         width: 100%;
         height: 220px;
         border-radius: 10px;
     }
 
+    .prediction-container {
+        margin-top: 15px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .prediction-card {
+        background: #ffffff;
+        border-radius: 10px;
+        padding: 12px;
+        box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+        font-size: 14px;
+        line-height: 1.4;
+    }
+    
+    .ride-card {
+        background: #f9f9f9;
+        padding: 10px;
+        border-radius: 8px;
+        margin: 6px 0;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+    
+    .best-option {
+        margin-top: 10px;
+        padding: 10px;
+        background: #e6f2ff;
+        border-radius: 8px;
+        font-weight: bold;
+        color: #0056b3;
+    }
 
     /* Search Button */
     #search-btn {
@@ -554,6 +586,123 @@ function initApp() {
         `);
         document.getElementById('back-btn').onclick = backToHome;
     };
+
+    // --- Smart Features Section ---
+
+const predictionContainer = document.createElement("div");
+predictionContainer.classList.add("prediction-container");
+document.getElementById("main-screen").appendChild(predictionContainer);
+
+async function getUserLocation() {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(showPredictions, handleLocationError);
+    } else {
+        showPredictions(null); // fallback if not supported
+    }
+}
+
+function handleLocationError(error) {
+    console.warn("Geolocation failed:", error);
+    showPredictions(null);
+}
+
+function showPredictions(position) {
+    const userLat = position?.coords?.latitude || 16.5062;
+    const userLon = position?.coords?.longitude || 80.6480;
+
+    const famousPlaces = [
+        { name: "Kanaka Durga Temple", etaMins: 12, distanceKm: 5.2 },
+        { name: "Benz Circle", etaMins: 8, distanceKm: 3.6 },
+        { name: "PVP Mall", etaMins: 10, distanceKm: 4.1 },
+        { name: "Prakasam Barrage", etaMins: 14, distanceKm: 6.2 }
+    ];
+
+    const foodPlaces = [
+        { name: "Babai Hotel", prepTime: 25 },
+        { name: "Minerva Coffee Shop", prepTime: 35 },
+        { name: "RR Durbar", prepTime: 28 },
+        { name: "Sweet Magic", prepTime: 22 }
+    ];
+
+    const randomPlace = famousPlaces[Math.floor(Math.random() * famousPlaces.length)];
+    const randomFood = foodPlaces[Math.floor(Math.random() * foodPlaces.length)];
+
+    const now = new Date();
+    const reachTime = new Date(now.getTime() + randomPlace.etaMins * 60000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    const foodEta = new Date(now.getTime() + randomFood.prepTime * 60000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+    predictionContainer.innerHTML = `
+        <div class="prediction-card">
+            <h4>📍 Nearby Attraction</h4>
+            <p><strong>${randomPlace.name}</strong> is just ${randomPlace.distanceKm} km away.</p>
+            <p>If you drive now, you’ll reach by <strong>${reachTime}</strong>.</p>
+        </div>
+
+        <div class="prediction-card">
+            <h4>🍱 Food Suggestion</h4>
+            <p>Craving something tasty? Try <strong>${randomFood.name}</strong>.</p>
+            <p>If ordered now, expected delivery by <strong>${foodEta}</strong>.</p>
+        </div>
+    `;
+}
+
+getUserLocation();
+
+// --- Commute and Food Nav Clicks ---
+document.querySelectorAll('.nav-item').forEach((nav, index) => {
+    nav.addEventListener('click', () => {
+        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+        nav.classList.add('active');
+
+        if (index === 0) { // Commute
+            const commuteData = [
+                { mode: "Rapido Bike", price: 45, time: "8 mins" },
+                { mode: "Rapido Auto", price: 65, time: "10 mins" },
+                { mode: "Ola Cab", price: 120, time: "12 mins" },
+                { mode: "Uber Cab", price: 110, time: "11 mins" }
+            ];
+            const best = commuteData.reduce((a, b) => a.price < b.price ? a : b);
+            pageContent.innerHTML = `
+                <div class="page">
+                    <div class="back-btn" id="back-btn">← Back</div>
+                    <h2>Commute Options</h2>
+                    <p>From your current location to <strong>${randomPlace.name}</strong>:</p>
+                    ${commuteData.map(r => `
+                        <div class="ride-card">
+                            <strong>${r.mode}</strong> — ₹${r.price}, ETA: ${r.time}
+                        </div>`).join('')}
+                    <div class="best-option">⭐ Best Option: ${best.mode} (₹${best.price})</div>
+                </div>`;
+            document.getElementById("back-btn").onclick = backToHome;
+            mainScreen.classList.add("hidden");
+            pageContent.classList.remove("hidden");
+        }
+
+        if (index === 2) { // Food
+            const deliveryOptions = [
+                { app: "Swiggy", eta: "25 mins" },
+                { app: "Zomato", eta: "30 mins" },
+                { app: "ETAIM", eta: "22 mins" }
+            ];
+            const best = deliveryOptions.reduce((a, b) => parseInt(a.eta) < parseInt(b.eta) ? a : b);
+            pageContent.innerHTML = `
+                <div class="page">
+                    <div class="back-btn" id="back-btn">← Back</div>
+                    <h2>Food Delivery Options</h2>
+                    <p>Nearby restaurant: <strong>${randomFood.name}</strong></p>
+                    ${deliveryOptions.map(d => `
+                        <div class="ride-card">
+                            <strong>${d.app}</strong> — ETA: ${d.eta}
+                        </div>`).join('')}
+                    <div class="best-option">⭐ Fastest: ${best.app} (${best.eta})</div>
+                </div>`;
+            document.getElementById("back-btn").onclick = backToHome;
+            mainScreen.classList.add("hidden");
+            pageContent.classList.remove("hidden");
+        }
+    });
+});
+
 
     // Settings Page
     document.getElementById('settings-btn').onclick = () => {
