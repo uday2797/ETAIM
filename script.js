@@ -94,6 +94,24 @@ const styles = `
         font-size: 16px;
     }
 
+    /* Search Ride Button */
+    #search-btn {
+        width: 100%;
+        background-color: var(--primary-blue);
+        color: white;
+        border: none;
+        padding: 12px;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 600;
+        margin-top: 10px;
+        cursor: pointer;
+        box-shadow: 0 4px 10px rgba(0, 123, 255, 0.3);
+    }
+    #search-btn:hover {
+        background-color: #0056cc;
+    }
+
     /* Suggestions */
     #suggestions-box {
         position: absolute;
@@ -124,14 +142,16 @@ const styles = `
     .ai-dashboard-container {
         display: flex;
         justify-content: center;
-        margin-top: 50px;
+        margin-top: 130px; /* moved down by 2 inches approx */
         margin-bottom: 40px;
     }
 
     .ai-dashboard-circle {
-        width: 150px;
-        height: 150px;
-        background-color: var(--primary-blue);
+        width: 200px; /* increased by 1 inch approx */
+        height: 200px;
+        background: linear-gradient(135deg, #ff00cc, #3333ff, #00ffff);
+        background-size: 300% 300%;
+        animation: rainbowShift 6s ease infinite;
         border-radius: 50%;
         color: white;
         display: flex;
@@ -139,9 +159,21 @@ const styles = `
         align-items: center;
         font-weight: bold;
         text-align: center;
-        font-size: 16px;
-        box-shadow: 0 5px 20px rgba(0, 123, 255, 0.4);
+        font-size: 18px;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.4);
         cursor: pointer;
+        transition: transform 0.3s ease;
+    }
+
+    .ai-dashboard-circle:hover {
+        transform: scale(1.08);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
+    }
+
+    @keyframes rainbowShift {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
     }
 
     /* Bottom Nav */
@@ -178,98 +210,15 @@ const styles = `
         color: var(--primary-blue);
     }
 
-    /* Side Menu */
-    .side-menu-overlay {
-        position: absolute;
-        top: 0;
-        left: 0;
-        height: 100%;
-        width: 100%;
-        background-color: rgba(0, 0, 0, 0.4);
-        z-index: 1000;
-        transition: opacity 0.3s ease, visibility 0.3s ease;
-    }
-
-    .side-menu-overlay.closed {
-        opacity: 0;
-        visibility: hidden;
-    }
-
-    .side-menu {
-        position: absolute;
-        top: 55px;
-        right: 20px;
-        width: 180px;
-        background-color: var(--dark-menu);
-        border-radius: 8px;
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
-        padding: 10px 0;
-        color: white;
-        display: flex;
-        flex-direction: column;
-    }
-
-    .menu-item {
-        padding: 12px 20px;
-        cursor: pointer;
-        transition: background-color 0.2s;
-    }
-
-    .menu-item:hover {
-        background-color: #1a4e85;
-    }
-
-    .menu-settings {
-        border-top: 1px solid rgba(255, 255, 255, 0.1);
-    }
-
-    /* Modal */
-    .modal-overlay {
-        position: absolute;
-        top: 0;
-        left: 0;
-        height: 100%;
-        width: 100%;
-        background-color: rgba(0, 0, 0, 0.6);
-        z-index: 1001;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    }
-
-    .modal-content {
-        background: white;
-        padding: 30px;
-        border-radius: 12px;
-        width: 80%;
-        max-width: 300px;
-        text-align: center;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-    }
-
-    #user-name-input {
-        width: 90%;
-        padding: 10px;
-        margin: 15px 0;
-        border: 1px solid #ddd;
-        border-radius: 6px;
-        text-align: center;
-    }
-
-    #save-name-btn {
-        background-color: var(--primary-blue);
-        color: white;
-        border: none;
-        padding: 10px 20px;
-        border-radius: 6px;
-        cursor: pointer;
+    /* Modal & Pages */
+    .modal-overlay, .side-menu-overlay, .page {
+        transition: all 0.3s ease;
     }
 
     .hidden {
         display: none !important;
     }
 
-    /* Pages */
     .page {
         padding: 20px;
         color: #333;
@@ -324,12 +273,13 @@ const getAppTemplate = (greeting = '') => `
                     <label>TO</label>
                     <input type="text" id="to-input" placeholder="Enter destination">
                 </div>
+                <button id="search-btn">Search Ride</button>
                 <div id="suggestions-box" class="hidden"></div>
             </div>
 
             <div class="ai-dashboard-container">
                 <div class="ai-dashboard-circle" id="ai-dashboard-btn">
-                    AI Dashboard
+                    Create AI Dashboard
                 </div>
             </div>
         </div>
@@ -383,17 +333,16 @@ function initApp() {
     };
 
     hamburger.onclick = () => sideMenu.classList.toggle('closed');
-    sideMenu.onclick = (e) => { if (e.target.id === 'side-menu-overlay') sideMenu.classList.add('closed'); };
-    aiBtn.onclick = () => alert('🚀 Opening AI Dashboard...');
 
-    // --- Menu Navigation ---
-    const navigateTo = (pageHTML) => {
-        // Close side menu first
-        sideMenu.classList.add('closed');
-        // Switch to new page
+    // --- Search button functionality ---
+    const searchBtn = document.getElementById('search-btn');
+    searchBtn.onclick = () => alert('🔍 Searching for rides...');
+
+    // --- Navigation ---
+    const navigateTo = (html) => {
         mainScreen.classList.add('hidden');
         pageContent.classList.remove('hidden');
-        pageContent.innerHTML = pageHTML;
+        pageContent.innerHTML = html;
     };
 
     const backToHome = () => {
@@ -401,7 +350,64 @@ function initApp() {
         mainScreen.classList.remove('hidden');
     };
 
-    // Profile
+    // --- AI Dashboard → Registration Form ---
+    aiBtn.onclick = () => {
+        navigateTo(`
+            <div class="page">
+                <div class="back-btn" id="back-btn">← Back</div>
+                <h2>Registration Form</h2>
+                <label>Destination Location:</label>
+                <input type="text" id="dest-location" placeholder="Enter destination" style="width:100%;padding:10px;margin-bottom:10px;border:1px solid #ccc;border-radius:6px;">
+
+                <div class="toggle">
+                    <span>Office Location?</span>
+                    <input type="checkbox" id="office-toggle">
+                </div>
+
+                <div id="login-time-container" class="hidden">
+                    <label>Login Time:</label>
+                    <input type="time" id="login-time" style="width:100%;padding:10px;margin-bottom:10px;border:1px solid #ccc;border-radius:6px;">
+                </div>
+
+                <label>Usual Commute Mode:</label>
+                <select id="commute-mode" style="width:100%;padding:10px;border-radius:6px;border:1px solid #ccc;margin-bottom:10px;">
+                    <option value="">Select</option>
+                    <option value="own">Own Vehicle</option>
+                    <option value="ola">Ola</option>
+                    <option value="uber">Uber</option>
+                    <option value="rapido">Rapido</option>
+                </select>
+
+                <label>Food Preference:</label>
+                <select id="food-pref" style="width:100%;padding:10px;border-radius:6px;border:1px solid #ccc;margin-bottom:15px;">
+                    <option value="">Select</option>
+                    <option value="south">South Indian</option>
+                    <option value="north">North Indian</option>
+                </select>
+
+                <button id="submit-btn" style="width:100%;padding:12px;background:var(--primary-blue);color:#fff;border:none;border-radius:6px;font-weight:600;">Submit</button>
+            </div>
+        `);
+
+        // Back button logic
+        document.getElementById('back-btn').onclick = backToHome;
+
+        // Office toggle visibility logic
+        const officeToggle = document.getElementById('office-toggle');
+        const loginTimeContainer = document.getElementById('login-time-container');
+        officeToggle.onchange = () => {
+            if (officeToggle.checked) loginTimeContainer.classList.remove('hidden');
+            else loginTimeContainer.classList.add('hidden');
+        };
+
+        // Submit button action
+        document.getElementById('submit-btn').onclick = () => {
+            alert('✅ Registration submitted successfully!');
+            backToHome();
+        };
+    };
+
+    // --- Profile, Login, Settings pages (unchanged) ---
     document.getElementById('profile-btn').onclick = () => {
         navigateTo(`
             <div class="page">
@@ -416,7 +422,6 @@ function initApp() {
         document.getElementById('back-btn').onclick = backToHome;
     };
 
-    // Login
     document.getElementById('login-btn').onclick = () => {
         navigateTo(`
             <div class="page">
@@ -431,7 +436,6 @@ function initApp() {
         document.getElementById('back-btn').onclick = backToHome;
     };
 
-    // Settings
     document.getElementById('settings-btn').onclick = () => {
         navigateTo(`
             <div class="page">
