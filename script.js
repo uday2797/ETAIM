@@ -112,7 +112,7 @@ const styles = `
     
     #map {
         width: 100%;
-        height: 160px; /* ↓ reduced height */
+        height: 100px; /* ↓ reduced height */
         border-radius: 10px;
         border: 1px solid #ddd;
         overflow: hidden;
