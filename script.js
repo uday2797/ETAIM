@@ -568,6 +568,127 @@ function initApp() {
         `);
         document.getElementById('back-btn').onclick = backToHome;
     };
+        // --- New Smart Enhancements (Mock + Real Location) ---
+     
+    let userCoords = null;
+
+    // Get current location
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(async (pos) => {
+            userCoords = [pos.coords.latitude, pos.coords.longitude];
+            console.log("📍 User location:", userCoords);
+
+            // Update map center to user's location
+            if (window.map && userCoords) {
+                map.setView(userCoords, 13);
+                L.marker(userCoords).addTo(map).bindPopup("You are here").openPopup();
+            }
+
+            // Generate nearby recommendations (mock)
+            showSmartInsights();
+        }, (err) => {
+            console.warn("❗ Location access denied, using default Vijayawada coords");
+            userCoords = [16.5062, 80.6480];
+            showSmartInsights();
+        });
+    } else {
+        console.warn("❗ Geolocation not supported");
+        userCoords = [16.5062, 80.6480];
+        showSmartInsights();
+    }
+
+    // Function to generate mock smart cards
+    function showSmartInsights() {
+        const insightsContainer = document.createElement("div");
+        insightsContainer.style.marginTop = "15px";
+
+        const famousPlaces = [
+            { name: "Kanaka Durga Temple", distance: "3.2 km", eta: "10 mins" },
+            { name: "Prakasam Barrage", distance: "4.5 km", eta: "15 mins" },
+            { name: "PVP Mall", distance: "2.8 km", eta: "8 mins" }
+        ];
+        const restaurants = [
+            { name: "Sweet Magic", eta: "30 mins" },
+            { name: "Ironhill Bistro", eta: "45 mins" },
+            { name: "Minerva Coffee Shop", eta: "35 mins" }
+        ];
+
+        const randomPlace = famousPlaces[Math.floor(Math.random() * famousPlaces.length)];
+        const randomFood = restaurants[Math.floor(Math.random() * restaurants.length)];
+
+        insightsContainer.innerHTML = `
+            <div style="background:#fff;padding:12px;border-radius:10px;box-shadow:0 2px 6px rgba(0,0,0,0.1);margin-bottom:10px;">
+                <h4 style="margin:0 0 5px;color:#007bff;">Nearby Highlight</h4>
+                <p style="margin:0;font-size:14px;">${randomPlace.name} – ${randomPlace.distance} away</p>
+                <small>ETA by car: ${randomPlace.eta}</small>
+            </div>
+            <div style="background:#fff;padding:12px;border-radius:10px;box-shadow:0 2px 6px rgba(0,0,0,0.1);">
+                <h4 style="margin:0 0 5px;color:#ff6f00;">Food ETA</h4>
+                <p style="margin:0;font-size:14px;">${randomFood.name} – delivers in ${randomFood.eta}</p>
+                <small>Mock estimate by Swiggy/Zomato</small>
+            </div>
+        `;
+        document.querySelector("#main-screen").appendChild(insightsContainer);
+    }
+
+    // --- Commute Details ---
+    const commuteBtn = document.querySelectorAll(".nav-item")[0];
+    commuteBtn.onclick = () => {
+        navigateTo(`
+            <div class="page">
+                <div class="back-btn" id="back-btn">← Back</div>
+                <h2>Nearby Famous Spots</h2>
+                <div style="margin-top:10px;">
+                    <div style="padding:10px;border-bottom:1px solid #eee;">
+                        <strong>Kanaka Durga Temple</strong> – 3.2 km<br>
+                        Ola: ₹110 | Uber: ₹105 | Rapido: ₹60<br>
+                        <small>Recommended: <b>Rapido (Cheap & Fast)</b></small>
+                    </div>
+                    <div style="padding:10px;border-bottom:1px solid #eee;">
+                        <strong>PVP Mall</strong> – 2.8 km<br>
+                        Ola: ₹90 | Uber: ₹95 | Rapido: ₹55<br>
+                        <small>Recommended: <b>Rapido</b></small>
+                    </div>
+                    <div style="padding:10px;border-bottom:1px solid #eee;">
+                        <strong>Prakasam Barrage</strong> – 4.5 km<br>
+                        Ola: ₹130 | Uber: ₹125 | Auto: ₹70<br>
+                        <small>Recommended: <b>Auto (Balanced Choice)</b></small>
+                    </div>
+                </div>
+            </div>
+        `);
+        document.getElementById("back-btn").onclick = backToHome;
+    };
+
+    // --- Food Details ---
+    const foodBtn = document.querySelectorAll(".nav-item")[2];
+    foodBtn.onclick = () => {
+        navigateTo(`
+            <div class="page">
+                <div class="back-btn" id="back-btn">← Back</div>
+                <h2>Top Restaurants Nearby</h2>
+                <div style="margin-top:10px;">
+                    <div style="padding:10px;border-bottom:1px solid #eee;">
+                        <strong>Sweet Magic</strong> – 30 mins delivery<br>
+                        Swiggy ETA: 28 min | Zomato ETA: 32 min<br>
+                        <small>Recommended: <b>Swiggy (Faster)</b></small>
+                    </div>
+                    <div style="padding:10px;border-bottom:1px solid #eee;">
+                        <strong>Ironhill Bistro</strong> – 45 mins delivery<br>
+                        Swiggy ETA: 47 min | Zomato ETA: 44 min<br>
+                        <small>Recommended: <b>Zomato (Slightly Faster)</b></small>
+                    </div>
+                    <div style="padding:10px;border-bottom:1px solid #eee;">
+                        <strong>Minerva Coffee Shop</strong> – 35 mins delivery<br>
+                        Swiggy ETA: 36 min | Zomato ETA: 35 min<br>
+                        <small>Recommended: <b>Either</b></small>
+                    </div>
+                </div>
+            </div>
+        `);
+        document.getElementById("back-btn").onclick = backToHome;
+    };
+    
 }
 
 const getGreeting = (name) => {
