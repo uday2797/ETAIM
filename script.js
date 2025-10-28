@@ -93,6 +93,7 @@ const styles = `
         box-sizing: border-box;
         font-size: 16px;
     }
+
     /* Search Button */
     #search-btn {
         width: 100%;
@@ -138,7 +139,7 @@ const styles = `
         background-color: #f0f4f8;
     }
 
-    /* --- AI DASHBOARD CIRCLE (enlarged & centered) --- */
+    /* AI Dashboard Circle */
     .ai-dashboard-container {
         display: flex;
         justify-content: center;
@@ -356,10 +357,9 @@ const getAppTemplate = (greeting = '') => `
                     <input type="text" id="to-input" placeholder="Enter destination">
                 </div>
                 <div id="suggestions-box" class="hidden"></div>
-				<!-- ✅ Add this Search button here -->
-                <button id="search-btn">Search Ride</button>
             </div>
-			
+
+            <button id="search-btn">Search Rides</button>
 
             <div class="ai-dashboard-container">
                 <div class="ai-dashboard-circle" id="ai-dashboard-btn">
@@ -403,6 +403,9 @@ function initApp() {
     const aiBtn = document.getElementById('ai-dashboard-btn');
     const pageContent = document.getElementById('page-content');
     const mainScreen = document.getElementById('main-screen');
+    const fromInput = document.getElementById('from-input');
+    const toInput = document.getElementById('to-input');
+    const suggestionsBox = document.getElementById('suggestions-box');
 
     if (!userName) nameModal.classList.remove('hidden');
 
@@ -418,25 +421,66 @@ function initApp() {
 
     hamburger.onclick = () => sideMenu.classList.toggle('closed');
     sideMenu.onclick = (e) => { if (e.target.id === 'side-menu-overlay') sideMenu.classList.add('closed'); };
-    aiBtn.onclick = () => alert('🚀 Opening AI Dashboard...');
 
-    // --- Menu Navigation ---
-    const navigateTo = (pageHTML) => {
-        // Close side menu first
-        sideMenu.classList.add('closed');
-        // Switch to new page
-        mainScreen.classList.add('hidden');
-        pageContent.classList.remove('hidden');
-        pageContent.innerHTML = pageHTML;
-    };
-	// Search button
+    // Nominatim Autocomplete
+    async function fetchLocationSuggestions(query) {
+        if (!query || query.length < 3) return [];
+        if (locationSuggestionsCache[query]) return locationSuggestionsCache[query];
+        try {
+            const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}`);
+            const data = await res.json();
+            locationSuggestionsCache[query] = data;
+            return data;
+        } catch (err) {
+            console.error('Error fetching locations:', err);
+            return [];
+        }
+    }
+
+    function showSuggestions(data, inputEl) {
+        if (!data.length) {
+            suggestionsBox.classList.add('hidden');
+            return;
+        }
+        suggestionsBox.innerHTML = data
+            .map(d => `<div class="suggestion-item">${d.display_name}</div>`)
+            .join('');
+        suggestionsBox.classList.remove('hidden');
+
+        document.querySelectorAll('.suggestion-item').forEach(item => {
+            item.onclick = () => {
+                inputEl.value = item.textContent;
+                suggestionsBox.classList.add('hidden');
+            };
+        });
+    }
+
+    [fromInput, toInput].forEach(inputEl => {
+        inputEl.addEventListener('input', async () => {
+            const query = inputEl.value.trim();
+            const suggestions = await fetchLocationSuggestions(query);
+            showSuggestions(suggestions, inputEl);
+        });
+    });
+
+    document.addEventListener('click', (e) => {
+        if (!suggestionsBox.contains(e.target) && e.target !== fromInput && e.target !== toInput) {
+            suggestionsBox.classList.add('hidden');
+        }
+    });
+
     document.getElementById('search-btn').onclick = () => {
-        alert('Searching rides...');
+        alert(`Searching rides from "${fromInput.value}" to "${toInput.value}"`);
     };
 
     // AI Dashboard
-    aiBtn.onclick = () => {
-        alert('🚀 Opening AI Dashboard...');
+    aiBtn.onclick = () => alert('🚀 Opening AI Dashboard...');
+
+    const navigateTo = (pageHTML) => {
+        sideMenu.classList.add('closed');
+        mainScreen.classList.add('hidden');
+        pageContent.classList.remove('hidden');
+        pageContent.innerHTML = pageHTML;
     };
 
     const backToHome = () => {
@@ -444,22 +488,22 @@ function initApp() {
         mainScreen.classList.remove('hidden');
     };
 
-    // Profile
+    // Profile Page
     document.getElementById('profile-btn').onclick = () => {
         navigateTo(`
             <div class="page">
                 <div class="back-btn" id="back-btn">← Back</div>
                 <h2>Profile</h2>
-                <p><strong>Name:</strong> ${userName || 'example'}</p>
+                <p><strong>Name:</strong> ${userName || 'Guest'}</p>
                 <p><strong>Email:</strong> example@example.com</p>
-                <p><strong>Phone:</strong> +1 555-123-4567</p>
+                <p><strong>Phone:</strong> +91-9999999999</p>
                 <p><strong>Member Since:</strong> Jan 2024</p>
             </div>
         `);
         document.getElementById('back-btn').onclick = backToHome;
     };
 
-    // Login
+    // Login Page
     document.getElementById('login-btn').onclick = () => {
         navigateTo(`
             <div class="page">
@@ -474,7 +518,7 @@ function initApp() {
         document.getElementById('back-btn').onclick = backToHome;
     };
 
-    // Settings
+    // Settings Page
     document.getElementById('settings-btn').onclick = () => {
         navigateTo(`
             <div class="page">
