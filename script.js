@@ -426,6 +426,15 @@ function initApp() {
         pageContent.classList.remove('hidden');
         pageContent.innerHTML = pageHTML;
     };
+	// Search button
+    document.getElementById('search-btn').onclick = () => {
+        alert('Searching rides...');
+    };
+
+    // AI Dashboard
+    aiBtn.onclick = () => {
+        alert('🚀 Opening AI Dashboard...');
+    };
 
     const backToHome = () => {
         pageContent.classList.add('hidden');
