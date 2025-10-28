@@ -93,25 +93,29 @@ const styles = `
         box-sizing: border-box;
         font-size: 16px;
     }
-    .map-section {
-        margin-top: 15px;
+    #map-section {
+        margin-top: 10px;
         background: #fff;
         padding: 10px;
-        border-radius: 15px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        position: relative;
+        z-index: 0;
     }
     
-    .map-section h3 {
+    #map-section h3 {
         text-align: center;
         margin-bottom: 8px;
-        font-size: 1rem;
+        font-size: 15px;
         color: #333;
     }
     
-    .map {
+    #map {
         width: 100%;
-        height: 220px;
+        height: 160px; /* ↓ reduced height */
         border-radius: 10px;
+        border: 1px solid #ddd;
+        overflow: hidden;
     }
 
 
