@@ -356,7 +356,10 @@ const getAppTemplate = (greeting = '') => `
                     <input type="text" id="to-input" placeholder="Enter destination">
                 </div>
                 <div id="suggestions-box" class="hidden"></div>
+				<!-- ✅ Add this Search button here -->
+                <button id="search-btn">Search Ride</button>
             </div>
+			
 
             <div class="ai-dashboard-container">
                 <div class="ai-dashboard-circle" id="ai-dashboard-btn">
