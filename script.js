@@ -385,16 +385,18 @@ const getAppTemplate = (greeting = '') => `
             </div>
 
             <button id="search-btn">Search Rides</button>
-
+            
+            <div id="map-section">
+                <h3>Nearby Activity Map</h3>
+                <div id="map"></div>
+            </div>
+            
             <div class="ai-dashboard-container">
                 <div class="ai-dashboard-circle" id="ai-dashboard-btn">
                     Create AI Dashboard
                 </div>
             </div>
-            <div id="map-section">
-                <h3>Nearby Activity Map</h3>
-                <div id="map"></div>
-            </div>
+
         </div>
 
         <div id="page-content" class="hidden"></div>
